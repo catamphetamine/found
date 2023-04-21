@@ -52,12 +52,12 @@
   "prettier": "@4c/prettier-config",
   "dependencies": {
     "@babel/runtime": "^7.16.5",
+    "@catamphetamine/farce": "^0.4.6",
     "@restart/context": "^2.1.4",
     "@restart/hooks": "^0.4.5",
     "@types/enzyme": "^3.10.12",
     "@types/react": ">=17.0.37",
     "dequal": "^2.0.2",
-    "farce": "^0.4.5",
     "is-promise": "^4.0.0",
     "tiny-set-immediate": "^1.0.2",
     "tiny-warning": "^1.0.3"

@@ -1,4 +1,4 @@
-import { BrowserProtocol } from 'farce';
+import { BrowserProtocol } from '@catamphetamine/farce';
 import createConnectedRouter from 'found/createConnectedRouter';
 import getStoreRenderArgs from 'found/getStoreRenderArgs';
 import resolver from 'found/resolver';

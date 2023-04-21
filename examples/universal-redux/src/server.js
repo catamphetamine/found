@@ -1,5 +1,5 @@
 import express from 'express';
-import { Actions as FarceActions, ServerProtocol } from 'farce';
+import { Actions as FarceActions, ServerProtocol } from '@catamphetamine/farce';
 import { RedirectException, getStoreRenderArgs, resolver } from 'found';
 import { RouterProvider } from 'found/server';
 import React from 'react';
@@ -61,7 +61,9 @@ app.use(
 );
 
 app.use(async (req, res) => {
-  const store = configureStore(new ServerProtocol(req.url));
+  const store = configureStore(new ServerProtocol(req.url, {
+    origin: `${req.protocol}://${req.host}`
+  }));
   store.dispatch(FarceActions.init());
   const matchContext = { store };
   let renderArgs;

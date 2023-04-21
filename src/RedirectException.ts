@@ -1,4 +1,4 @@
-import { LocationDescriptor } from 'farce';
+import { LocationDescriptor } from '@catamphetamine/farce';
 
 // This isn't really an error.
 export default class RedirectException {

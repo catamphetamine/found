@@ -1,4 +1,4 @@
-import { createHistoryEnhancer, queryMiddleware } from 'farce';
+import { createHistoryEnhancer, queryMiddleware } from '@catamphetamine/farce';
 import Matcher from 'found/Matcher';
 import createMatchEnhancer from 'found/createMatchEnhancer';
 import foundReducer from 'found/foundReducer';

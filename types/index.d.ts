@@ -12,7 +12,7 @@ import {
   Protocol,
   Query,
   QueryDescriptor,
-} from 'farce';
+} from '@catamphetamine/farce';
 import * as React from 'react';
 import { Middleware, Reducer, Store, StoreEnhancer } from 'redux';
 

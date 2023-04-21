@@ -1,4 +1,4 @@
-import { Location } from 'farce';
+import { Location } from '@catamphetamine/farce';
 
 import useMatch from './useMatch';
 

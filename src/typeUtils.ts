@@ -13,7 +13,7 @@ import {
   Protocol,
   Query,
   QueryDescriptor,
-} from 'farce';
+} from '@catamphetamine/farce';
 import * as React from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Middleware, Reducer, Store, StoreEnhancer } from 'redux';

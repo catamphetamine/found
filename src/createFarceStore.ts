@@ -1,4 +1,4 @@
-import { FarceStoreExtension, Protocol } from 'farce';
+import { FarceStoreExtension, Protocol } from '@catamphetamine/farce';
 import FarceActions from 'farce/Actions';
 import createHistoryEnhancer, {
   HistoryEnhancerOptions,
