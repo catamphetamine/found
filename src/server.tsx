@@ -1,5 +1,5 @@
-import FarceActions from 'farce/Actions';
-import ServerProtocol from 'farce/ServerProtocol';
+import FarceActions from '@catamphetamine/farce/Actions';
+import ServerProtocol from '@catamphetamine/farce/ServerProtocol';
 import React, { useMemo } from 'react';
 
 import RouterContext from './RouterContext';

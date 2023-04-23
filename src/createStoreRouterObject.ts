@@ -1,4 +1,4 @@
-import FarceActions from 'farce/Actions';
+import FarceActions from '@catamphetamine/farce/Actions';
 import { Store, bindActionCreators } from 'redux';
 
 import { Router } from './typeUtils';

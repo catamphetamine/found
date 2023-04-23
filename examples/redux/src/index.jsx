@@ -1,7 +1,7 @@
-import FarceActions from 'farce/Actions';
-import BrowserProtocol from 'farce/BrowserProtocol';
-import createHistoryEnhancer from 'farce/createHistoryEnhancer';
-import queryMiddleware from 'farce/queryMiddleware';
+import FarceActions from '@catamphetamine/farce/Actions';
+import BrowserProtocol from '@catamphetamine/farce/BrowserProtocol';
+import createHistoryEnhancer from '@catamphetamine/farce/createHistoryEnhancer';
+import queryMiddleware from '@catamphetamine/farce/queryMiddleware';
 import {
   Redirect,
   Matcher,

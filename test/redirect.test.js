@@ -1,5 +1,5 @@
 import delay from 'delay';
-import MemoryProtocol from 'farce/MemoryProtocol';
+import MemoryProtocol from '@catamphetamine/farce/MemoryProtocol';
 import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
 

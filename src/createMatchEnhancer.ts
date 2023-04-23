@@ -1,4 +1,4 @@
-import FarceActionTypes from 'farce/ActionTypes';
+import FarceActionTypes from '@catamphetamine/farce/ActionTypes';
 import { Middleware, Store, StoreEnhancer, applyMiddleware } from 'redux';
 
 import ActionTypes from './ActionTypes';

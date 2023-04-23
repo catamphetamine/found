@@ -1,9 +1,9 @@
 import { FarceStoreExtension, Protocol } from '@catamphetamine/farce';
-import FarceActions from 'farce/Actions';
+import FarceActions from '@catamphetamine/farce/Actions';
 import createHistoryEnhancer, {
   HistoryEnhancerOptions,
-} from 'farce/createHistoryEnhancer';
-import queryMiddleware from 'farce/queryMiddleware';
+} from '@catamphetamine/farce/createHistoryEnhancer';
+import queryMiddleware from '@catamphetamine/farce/queryMiddleware';
 import {
   Middleware,
   StoreEnhancer,

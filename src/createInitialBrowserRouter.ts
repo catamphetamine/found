@@ -1,4 +1,4 @@
-import BrowserProtocol from 'farce/BrowserProtocol';
+import BrowserProtocol from '@catamphetamine/farce/BrowserProtocol';
 
 import createInitialFarceRouter from './createInitialFarceRouter';
 import resolver from './resolver';
