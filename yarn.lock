@@ -2115,10 +2115,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@catamphetamine/farce@^0.4.6":
-  version "0.4.6"
-  resolved "https://registry.yarnpkg.com/@catamphetamine/farce/-/farce-0.4.6.tgz#83f1578f859b9c9d3113a3b51d6358568e68b5f9"
-  integrity sha512-VMHPXoJldvFrlmqZEpH+xFCIxqLqSnJZHBS+9lSfpukfi6moUP4fmt9i1zgE1hVSnFTh1WIX2Kqiz+eBHc2dQA==
+"@catamphetamine/farce@^0.4.7":
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/@catamphetamine/farce/-/farce-0.4.7.tgz#3f0056f95763506ea0dac82d0abe5f9ff3969e82"
+  integrity sha512-v3hyyCvyhLcYZasuPlQAC3tU9KGMF17JBSnB06Soml7zzbzTWxTw99vEu1lgZzZrj55PCrWgMsbXKGfOyYePxg==
   dependencies:
     query-string "^5.1.1"
     redux "^4.1.2"
