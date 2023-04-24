@@ -1,7 +1,7 @@
-import delay from 'delay';
 import FarceActions from '@catamphetamine/farce/Actions';
 import MemoryProtocol from '@catamphetamine/farce/MemoryProtocol';
 import ServerProtocol from '@catamphetamine/farce/ServerProtocol';
+import delay from 'delay';
 import pDefer from 'p-defer';
 import React, { useEffect } from 'react';
 import TestRenderer, { act } from 'react-test-renderer';

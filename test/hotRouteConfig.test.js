@@ -1,5 +1,5 @@
-import delay from 'delay';
 import ServerProtocol from '@catamphetamine/farce/ServerProtocol';
+import delay from 'delay';
 import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
 
