@@ -55,7 +55,7 @@ export async function getFarceResult({
   }),
 }): Promise<FarceResult> {
   const store = createFarceStore({
-    historyProtocol: new ServerProtocol(url),
+    historyProtocol: new ServerProtocol({ url }),
     historyMiddlewares,
     historyOptions,
     routeConfig,

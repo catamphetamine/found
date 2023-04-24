@@ -25,7 +25,7 @@ describe('hotRouteConfig', () => {
     ]);
 
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historyProtocol: new ServerProtocol({ url: '/foo' }),
       routeConfig,
 
       render: createRender({}),

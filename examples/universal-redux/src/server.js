@@ -61,7 +61,8 @@ app.use(
 );
 
 app.use(async (req, res) => {
-  const store = configureStore(new ServerProtocol(req.url, {
+  const store = configureStore(new ServerProtocol({
+    url: req.url,
     origin: `${req.protocol}://${req.host}`
   }));
   store.dispatch(FarceActions.init());

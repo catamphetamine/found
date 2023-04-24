@@ -16,7 +16,7 @@ import { InstrumentedResolver } from './helpers';
 describe('Router', () => {
   it('should render match', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historyProtocol: new ServerProtocol({ url: '/foo' }),
       routeConfig: [
         {
           path: '/foo',
@@ -41,7 +41,7 @@ describe('Router', () => {
 
   it('should render 404 when no routes match', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historyProtocol: new ServerProtocol({ url: '/foo' }),
       routeConfig: [],
 
       renderError: ({ error }) => <div className={`error-${error.status}`} />,
@@ -61,7 +61,7 @@ describe('Router', () => {
 
   it('should support throwing HttpError in route render method', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historyProtocol: new ServerProtocol({ url: '/foo' }),
       routeConfig: [
         {
           path: '/foo',
@@ -89,7 +89,7 @@ describe('Router', () => {
 
   it('should support reloading the route configuration', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historyProtocol: new ServerProtocol({ url: '/foo' }),
       routeConfig: [
         {
           path: '/foo',

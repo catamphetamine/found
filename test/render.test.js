@@ -12,7 +12,7 @@ describe('render', () => {
     const deferred = pDefer();
 
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo/baz/a'),
+      historyProtocol: new ServerProtocol({ url: '/foo/baz/a' }),
       routeConfig: [
         {
           path: 'foo',
@@ -70,7 +70,7 @@ describe('render', () => {
     const deferred = pDefer();
 
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo/bar/qux/a'),
+      historyProtocol: new ServerProtocol({ url: '/foo/bar/qux/a' }),
       routeConfig: [
         {
           path: 'foo',
@@ -147,7 +147,7 @@ describe('render', () => {
 
   it('should support route render method returning a function', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historyProtocol: new ServerProtocol({ url: '/foo' }),
       routeConfig: [
         {
           path: '/foo',
@@ -208,7 +208,7 @@ describe('render', () => {
 
   it('should support custom renderReady', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historyProtocol: new ServerProtocol({ url: '/foo' }),
       routeConfig: [
         {
           path: 'foo',
@@ -233,7 +233,7 @@ describe('render', () => {
 
   it('should support fully custom render', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historyProtocol: new ServerProtocol({ url: '/foo' }),
       routeConfig: [
         {
           path: 'foo',
