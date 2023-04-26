@@ -117,6 +117,14 @@ export default function createBaseRouter({
 
     componentDidMount() {
       this.mounted = true;
+
+      // Fixes a bug when `found` ignores all navigation actions until its `componentDidMount()` is called.
+      if (typeof window !== 'undefined') {
+        if (window.onFoundRouterIsReady) {
+          window.onFoundRouterIsReady();
+        }
+      }
+
       if (!this.props.initialRenderArgs) {
         this.resolveMatch();
       }

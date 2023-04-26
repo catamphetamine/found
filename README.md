@@ -1,7 +1,7 @@
 <div align="center">
 <img src="https://4Catalyzer.github.io/found/img/f-logo-empty.svg" width="200">
 <!---
-Logo created by [Szymon Wiszczuk](https://www.github.com/golota60) 
+Logo created by [Szymon Wiszczuk](https://www.github.com/golota60)
 -->
 <h1>Found</h1>
 <p>
@@ -10,6 +10,22 @@ Logo created by [Szymon Wiszczuk](https://www.github.com/golota60)
 <br>
 
 </div>
+
+<p>
+  This is a fork of the original <code>found</code> package with some changes:
+</p>
+<ul>
+  <li>
+    <code>redux</code> and <code>react-redux</code> are <code>peerDependencies</code> instead of <code>dependencies</code>
+  </li>
+  <li>
+    <code>farce</code> was replaced with <code>@catamphetamine/farce</code>
+  </li>
+  <li>
+    Fixed a bug when <code>found</code> ignores all navigation actions until its <code>componentDidMount()</code> is called.
+  </li>
+</ul>
+<br>
 
 [![Travis][build-badge]][build] [![npm][npm-badge]][npm]
 

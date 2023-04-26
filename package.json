@@ -52,7 +52,7 @@
   "prettier": "@4c/prettier-config",
   "dependencies": {
     "@babel/runtime": "^7.16.5",
-    "@catamphetamine/farce": "^0.4.17",
+    "@catamphetamine/farce": "^0.4.18",
     "@restart/context": "^2.1.4",
     "@restart/hooks": "^0.4.5",
     "@types/enzyme": "^3.10.12",
