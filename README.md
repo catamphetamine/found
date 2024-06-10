@@ -16,13 +16,13 @@ Logo created by [Szymon Wiszczuk](https://www.github.com/golota60)
 </p>
 <ul>
   <li>
-    <code>redux</code> and <code>react-redux</code> are now <code>peerDependencies</code> instead of <code>dependencies</code>. This fixed a version conflict bug in cases when <code>found</code> and the application itself used different versions of those two packages.
+    In <code>package.json</code>, moved <code>redux</code> and <code>react-redux</code> from <code>dependencies</code> to <code>peerDependencies</code>. This fixed a version conflict bug in cases when <code>found</code> and the application itself used different versions of those two packages.
   </li>
   <li>
-    <code>farce</code> dependency was replaced with <code>@catamphetamine/farce</code>.
+    <code>farce</code> dependency was replaced with <code>@catamphetamine/farce</code> fork.
   </li>
   <li>
-    Added a workaround (<a href="https://github.com/catamphetamine/found/commit/be416e3bc0715207f861fb5466ed666e9d7c016c">part 1</a>, part 2) for a bug when <code>found</code> router ignores any navigation actions that have been dispatched before its <code>componentDidMount()</code> was called. Now it exports a client-side-only <code>onRouterReady()</code> function that could be used to execute code only after the router is ready to process navigation actions.
+    Added a workaround (<a href="https://github.com/catamphetamine/found/commit/be416e3bc0715207f861fb5466ed666e9d7c016c">part 1</a>, <a href="https://github.com/catamphetamine/found/commit/e63e8902cb1ea686086d7656a5c1732f818218c1">part 2</a>) for a bug when <code>found</code> router ignores any navigation actions that have been dispatched before its <code>componentDidMount()</code> was called. Now it exports a client-side-only <code>onRouterReady()</code> function that could be used to execute code only after the router is ready to process navigation actions.
   </li>
 </ul>
 <br>
