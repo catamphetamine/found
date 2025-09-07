@@ -10,9 +10,14 @@ export default function getStoreRenderArgs({
   getFound = ({ found }: any) => found,
   matchContext,
   resolver,
+  session,
   basePath,
 }: GetStoreRenderArgsOptions): Promise<RenderArgs> {
-  const router = createStoreRouterObject(store, { basePath });
+  const router = createStoreRouterObject(store, {
+    getFound,
+    session,
+    basePath,
+  });
   const match = getFound(store.getState()).resolvedMatch;
 
   return getRenderArgs(router, { match, matchContext, resolver });

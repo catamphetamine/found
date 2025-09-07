@@ -17,6 +17,7 @@ export { default as hotRouteConfig } from './hotRouteConfig';
 export { default as HttpError } from './HttpError';
 export { default as Link } from './Link';
 export { default as Matcher } from './Matcher';
+export { default as ScrollManager } from './ScrollManager';
 export { default as onRouterReady } from './onRouterReady';
 export {
   default as createRedirect,

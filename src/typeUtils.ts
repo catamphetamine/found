@@ -379,5 +379,6 @@ export interface GetStoreRenderArgsOptions {
   getFound?: (store: Store) => FoundState;
   matchContext: any;
   resolver: Resolver;
+  session: Session;
   basePath?: string;
 }

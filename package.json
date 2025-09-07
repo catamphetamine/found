@@ -74,7 +74,6 @@
   },
   "devDependencies": {
     "@4c/prettier-config": "^1.1.0",
-    "@4c/rollout": "patch:@4c/rollout@npm%3A4.0.2#~/.yarn/patches/@4c-rollout-npm-4.0.2-ab2b6d0bab.patch",
     "@babel/cli": "^7.28.0",
     "@babel/core": "^7.28.0",
     "@babel/plugin-transform-export-namespace-from": "^7.27.1",

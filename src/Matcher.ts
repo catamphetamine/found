@@ -149,9 +149,7 @@ export default class Matcher {
   ) {
     const groups: Record<string, IntermediateRouteMatch[]> = {};
     const failedGroups = [] as string[];
-    const abortEarly =
-      process.env.NODE_ENV === 'production' ||
-      !this.options.warnOnPartiallyMatchedNamedRoutes;
+    const abortEarly = !this.options.warnOnPartiallyMatchedNamedRoutes;
 
     for (const [groupName, routes] of Object.entries(routeGroups)) {
       const groupMatch = this.matchRoutes(routes, pathname);

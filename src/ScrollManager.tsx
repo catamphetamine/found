@@ -31,7 +31,7 @@ export const ScrollContext = createContext<IContext | null>(null);
 // Rewrote `<ScrollManager/>` from `found-scroll` in React hooks.
 // Also fixed React strict mode bug.
 // https://github.com/4Catalyzer/found-scroll/issues/382
-export const ScrollManager: React.FC<Props> = ({
+const ScrollManager: React.FC<Props> = ({
   session,
   renderArgs,
   // _shouldUpdateScrollPosition: shouldUpdateScrollPositionProperty,
@@ -139,6 +139,8 @@ export const ScrollManager: React.FC<Props> = ({
     children,
   );
 };
+
+export default ScrollManager;
 
 interface Props {
   session: Session;

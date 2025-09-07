@@ -33,6 +33,7 @@ export default async function createInitialFarceRouter({
     store,
     matchContext,
     resolver,
+    session: historySession,
     basePath: historyOptions?.basePath,
   });
 

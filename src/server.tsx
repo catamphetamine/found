@@ -65,8 +65,10 @@ export async function getFarceResult({
     renderError,
   }),
 }: GetFarceResultOptions): Promise<FarceResult> {
+  const session = new ServerSideRenderSession();
+
   const store = createFarceStore({
-    historySession: new ServerSideRenderSession(),
+    historySession: session,
     historyMiddlewares,
     historyOptions,
     initialLocation: url,
@@ -80,6 +82,7 @@ export async function getFarceResult({
       store,
       matchContext,
       resolver,
+      session,
       basePath: historyOptions?.basePath,
     });
   } catch (e: any) {
