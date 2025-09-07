@@ -82,8 +82,8 @@ function parse(str, options) {
       pattern: pattern
         ? escapeGroup(pattern)
         : asterisk
-        ? '.*'
-        : `[^${escapeString(delimiter)}]+?`,
+          ? '.*'
+          : `[^${escapeString(delimiter)}]+?`,
     });
   }
 

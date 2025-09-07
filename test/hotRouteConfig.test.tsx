@@ -1,5 +1,5 @@
 import delay from 'delay';
-import ServerProtocol from 'farce/ServerProtocol';
+import { ServerSideRenderSession } from 'navigation-stack';
 import { act, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -25,7 +25,8 @@ describe('hotRouteConfig', () => {
     ]);
 
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historySession: new ServerSideRenderSession(),
+      initialLocation: '/foo',
       routeConfig,
       render: createRender({}),
     });

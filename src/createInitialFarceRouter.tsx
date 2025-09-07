@@ -8,18 +8,20 @@ import {
 } from './typeUtils';
 
 export default async function createInitialFarceRouter({
-  historyProtocol,
+  historySession,
   historyMiddlewares,
   historyOptions,
+  initialLocation,
   routeConfig,
   matchContext,
   resolver,
   ...options
 }: InitialFarceRouterOptions): Promise<FarceRouter> {
   const store = createFarceStore({
-    historyProtocol,
+    historySession,
     historyMiddlewares,
     historyOptions,
+    initialLocation,
     routeConfig,
   });
 
@@ -31,6 +33,7 @@ export default async function createInitialFarceRouter({
     store,
     matchContext,
     resolver,
+    basePath: historyOptions?.basePath,
   });
 
   function InitialFarceRouter(props: FarceRouterProps) {

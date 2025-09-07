@@ -1,4 +1,4 @@
-import FarceActionTypes from 'farce/ActionTypes';
+import { ActionTypes as HistoryActionTypes } from 'navigation-stack/redux';
 import {
   type Middleware,
   type Store,
@@ -8,6 +8,7 @@ import {
 
 import ActionTypes from './ActionTypes';
 import Matcher from './Matcher';
+import replaceRouteConfig_ from './replaceRouteConfig';
 import {
   type FoundState,
   type FoundStoreExtension,
@@ -21,7 +22,7 @@ function createMatchMiddleware(
   return function matchMiddleware(store: Store) {
     return (next) => (action) => {
       const { type, payload } = action;
-      if (type !== FarceActionTypes.UPDATE_LOCATION) {
+      if (type !== HistoryActionTypes.UPDATE) {
         return next(action);
       }
 
@@ -61,12 +62,7 @@ export default function createMatchEnhancer(
       const store = middlewareEnhancer(createStore)(...args);
 
       function replaceRouteConfig(routeConfig: RouteConfig) {
-        matcher.replaceRouteConfig(routeConfig);
-
-        store.dispatch<any>({
-          type: FarceActionTypes.UPDATE_LOCATION,
-          payload: getFound(store.getState()).match.location,
-        });
+        replaceRouteConfig_(routeConfig, matcher, store, getFound);
       }
 
       return {

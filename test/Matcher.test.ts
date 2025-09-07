@@ -359,7 +359,6 @@ describe('Matcher', () => {
       ['slashes everywhere', '/foo/', '/bar'],
     ].forEach(([scenario, basePath, path]) => {
       it(`should support ${scenario}`, () => {
-        // @ts-expect-error - joinPaths is protected
         expect(matcher.joinPaths(basePath, path)).toBe('/foo/bar');
       });
     });

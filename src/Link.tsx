@@ -2,11 +2,15 @@ import useEventCallback from '@restart/hooks/useEventCallback';
 import { forwardRef, type MouseEvent, type SyntheticEvent } from 'react';
 
 import useRouter from './useRouter';
-import { LocationDescriptor } from 'farce';
+import {
+  getLocationUrl,
+  parseLocationUrl,
+  type InputLocation,
+} from 'navigation-stack';
 import { Match, Router } from './typeUtils';
 
 export type LinkPropsCommon = {
-  to: LocationDescriptor;
+  to: InputLocation;
 
   exact?: boolean;
   target?: React.HTMLAttributeAnchorTarget;
@@ -90,11 +94,18 @@ const Link = forwardRef<any, LinkProps>(
       router.push(to);
     });
 
-    const href = router.createHref(to);
+    const href = router.addBasePath(
+      typeof to === 'string' ? to : getLocationUrl(to),
+    );
     const childrenIsFunction = typeof children === 'function';
 
     if (childrenIsFunction || activeClassName || activeStyle) {
-      const toLocation = router.createLocation(to);
+      // Ensure that `toLocation` has the correct `query` property.
+      // For example, if `to` has `search` but not `query`, it would create `query` from `search`.
+      const toLocation =
+        typeof to === 'string'
+          ? parseLocationUrl(to)
+          : parseLocationUrl(getLocationUrl(to));
       const active = router.isActive(match!, toLocation, { exact });
 
       if (childrenIsFunction) {

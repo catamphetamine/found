@@ -1,4 +1,4 @@
-import BrowserProtocol from 'farce/BrowserProtocol';
+import { WebBrowserSession } from 'navigation-stack';
 
 import createFarceRouter from './createFarceRouter';
 import resolver from './resolver';
@@ -13,7 +13,7 @@ export default function createBrowserRouter(
 ): BrowserRouter {
   const Router = createFarceRouter({
     ...options,
-    historyProtocol: new BrowserProtocol(),
+    historySession: new WebBrowserSession(),
   });
 
   function BrowserRouterInstance(props: FarceRouterProps) {

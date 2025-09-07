@@ -1,4 +1,4 @@
-import BrowserProtocol from 'farce/BrowserProtocol';
+import { WebBrowserSession } from 'navigation-stack';
 
 import createInitialFarceRouter from './createInitialFarceRouter';
 import resolver from './resolver';
@@ -12,7 +12,7 @@ export default function createInitialBrowserRouter(
 ): Promise<BrowserRouter> {
   return createInitialFarceRouter({
     ...options,
-    historyProtocol: new BrowserProtocol(),
+    historySession: new WebBrowserSession(),
     resolver,
   });
 }

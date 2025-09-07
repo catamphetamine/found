@@ -1,28 +1,35 @@
-import {
-  type Session,
-  type Location,
-  type InputLocation,
-  type InputLocationObject,
-  type InputLocationQuery,
-  type NavigationBlocker,
-  type NavigationBlockerResult,
-  type Query,
-} from 'navigation-stack';
-import { type CreateMiddlewaresOptions } from 'navigation-stack/redux';
-import * as React from 'react';
-import { Middleware, Store } from 'redux';
+// TypeScript Version: 4.0
 
-import HttpError from './HttpError';
-import Matcher from './Matcher';
+import {
+  Session,
+  Location,
+  InputLocation,
+  InputLocationObject,
+  InputLocationQuery,
+  NavigationBlocker,
+  NavigationBlockerResult,
+  Query,
+} from 'navigation-stack';
+import { CreateMiddlewaresOptions } from 'navigation-stack/redux';
+import * as React from 'react';
+import { Middleware, Reducer, Store, StoreEnhancer } from 'redux';
 
 export {
-  type Query,
-  type InputLocationQuery,
-  type Location,
-  type InputLocation,
-  type InputLocationObject,
-  type NavigationBlockerResult,
-  type NavigationBlocker,
+  Query,
+  Location,
+  InputLocation,
+  InputLocationObject,
+  InputLocationQuery,
+  NavigationBlockerOptions,
+  NavigationBlockerResult,
+  NavigationBlocker,
+};
+
+type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
+
+export const ActionTypes: {
+  UPDATE_MATCH: '@@found/UPDATE_MATCH';
+  RESOLVE_MATCH: '@@found/RESOLVE_MATCH';
 };
 
 export type Params = Record<string, string>;
@@ -32,9 +39,11 @@ export type ParamsDescriptor = Record<
   string | number | boolean | Record<string, unknown>
 >;
 
-export type GroupRouteIndices = Record<string, RouteIndices>;
-
-export type RouteIndices = Array<number | GroupRouteIndices>;
+// These need to be interfaces to avoid circular reference issues.
+/* eslint-disable @typescript-eslint/no-empty-interface */
+interface GroupRouteIndices extends Record<string, RouteIndices> {}
+export interface RouteIndices extends Array<number | GroupRouteIndices> {}
+/* eslint-enable @typescript-eslint/no-empty-interface */
 
 export interface MatcherResult {
   routeIndices: RouteIndices;
@@ -75,23 +84,53 @@ export interface Match<TContext = any> extends MatchBase {
 }
 
 export interface Resolver {
-  resolveElements(
-    match: Match,
-  ): AsyncGenerator<Array<ResolvedElement> | undefined>;
+  resolveElements(match: Match): AsyncIterable<ResolvedElement[]>;
 }
 
-// export const resolver: Resolver;
+export const resolver: Resolver;
 
 export interface FoundState {
   match: MatchBase;
   resolvedMatch: MatchBase;
 }
 
+export const foundReducer: Reducer<FoundState>;
+
 export interface IsActiveOptions {
   exact?: boolean;
 }
 
-// export interface Router extends FoundStoreExtension, BasePathStoreExtension {
+/**
+ * An object implementing the matching algorithm.
+ *
+ * User code generally shouldn't need this, but it doesn't hurt to here,
+ * since we use it for routerShape below.
+ */
+export class Matcher {
+  constructor(routeConfig: RouteConfig);
+
+  match(location: Location): MatcherResult | null;
+
+  getRoutes: (match: MatchBase) => RouteObject[];
+
+  /**
+   * for match as above, returns whether match corresponds to location or a
+   * subpath of location; if exact is set, returns whether match corresponds
+   * exactly to location
+   */
+  isActive: (
+    match: Match,
+    location: InputLocation,
+    options?: IsActiveOptions,
+  ) => boolean;
+
+  /**
+   * Returns the path string for a pattern of the same format as a route path
+   * and a object of the corresponding path parameters
+   */
+  format: (pattern: string, params: ParamsDescriptor) => string;
+}
+
 export interface Router extends FoundStoreExtension {
   /**
    * Navigates to a new location
@@ -106,34 +145,20 @@ export interface Router extends FoundStoreExtension {
   /**
    * Moves delta steps in the history stack
    * @see farce
-   *
    */
   go: (delta: number) => void;
-
-  // It seems to be not required to provide a way of adding a `basePath` to a `location` object,
-  // even though the actual `addBasePath()` function implementation supports that type of an argument.
-  //
-  // addBasePath: <L extends Location | string>(location: L) => L;
-  addBasePath: (url: string) => string;
-
-  // addNavigationListener: (listener: (newLocation: Location) => void) => void;
-
-  addNavigationBlocker: (
-    blocker: (newLocation: Location) => boolean | undefined,
-  ) => void;
 
   isActive: Matcher['isActive'];
 }
 
 /**
- * A near superset of Match.
  * The match for a specific route, including that route and its own params.
  */
 export interface RouteMatch extends Omit<Match, 'routeParams'> {
   /**
-   * The route object or array corresponding to this component
+   * The route object corresponding to this component
    */
-  route: RouteObject[] | RouteObject;
+  route: RouteObject[];
   /**
    * The path parameters for route
    */
@@ -157,12 +182,12 @@ export interface RouteRenderArgs {
    * The component for the route, if any; null if the component has not yet
    * been loaded
    */
-  Component?: React.ComponentType<any> | null;
+  Component?: React.ComponentType<any>;
   /**
    * The default props for the route component, specifically match with data
    * as an additional property; null if data have not yet been loaded
    */
-  props?: RenderProps | null;
+  props?: RenderProps;
   /**
    * The data for the route, as above; null if the data have not yet been
    * loaded
@@ -201,11 +226,11 @@ export interface RouteObjectBase {
   /**
    * additional data for the route
    */
-  data?: unknown;
+  data?: any;
   /**
    * a method that returns additional data for the route
    */
-  getData?: (match: RouteMatch) => unknown | Promise<unknown>;
+  getData?: (match: RouteMatch) => any;
   /**
    * whether to defer getting data until ancestor data promises are resolved
    */
@@ -215,26 +240,6 @@ export interface RouteObjectBase {
    * @throws {RedirectException}
    */
   render?: RouteRenderMethod;
-
-  /**
-   * Convenience prop for indicating a Route with children also functions
-   * as it's own index route.
-   *
-   * ```tsx
-   * <Route allowAsIndex path='parent' Component={Page}>
-   *    <Route path='child' Component={ChildPage}/>
-   * </Route>
-   * ```
-   *
-   * This is equivalent to when matching `'/parent'`:
-   * ```tsx
-   * <Route path='parent' Component={Page}>
-   *    <Route Component={() => null}/>
-   *    <Route path='child' Component={ChildPage}/>
-   * </Route>
-   * ```
-   */
-  allowAsIndex?: boolean;
 
   // Provide indexer allowing for other properties.
   [key: string]: any;
@@ -256,6 +261,19 @@ export interface RouteProps extends RouteObjectBase {
 /**
  * JSX Route
  */
+export class Route extends React.Component<RouteProps> {
+  constructor(options: RouteObject | RouteProps);
+}
+
+export function hotRouteConfig(routeConfig: RouteConfig): RouteConfig;
+
+export class HttpError {
+  status: number;
+
+  data: any;
+
+  constructor(status: number, data?: any);
+}
 
 export interface RedirectOptions {
   from?: string;
@@ -266,6 +284,95 @@ export interface RedirectOptions {
 // It's more "natural" to call this "props" when used in the context of a
 //  React component.
 export type RedirectProps = RedirectOptions;
+
+export class Redirect extends React.Component<RedirectProps> {
+  constructor(config: RedirectOptions);
+}
+
+export interface LinkPropsCommon {
+  to: InputLocation;
+  // match: Match,  provided by withRouter
+  // router: Router, provided by withRouter
+  exact?: boolean;
+  target?: string;
+  onClick?: (event: React.SyntheticEvent<any>) => void;
+}
+
+export interface LinkInjectedProps {
+  href: string;
+  onClick: (event: React.SyntheticEvent<any>) => void;
+}
+
+export interface LinkPropsNodeChild extends LinkPropsCommon {
+  activeClassName?: string;
+  activeStyle?: Record<string, unknown>;
+  children?: React.ReactNode;
+}
+
+type ReplaceLinkProps<TInner extends React.ElementType, TProps> = Omit<
+  React.ComponentProps<TInner>,
+  keyof TProps | keyof LinkInjectedProps
+> &
+  TProps;
+
+export type LinkPropsSimple = ReplaceLinkProps<'a', LinkPropsNodeChild>;
+
+export type LinkPropsWithAs<
+  TInner extends React.ElementType<LinkInjectedProps>,
+> = ReplaceLinkProps<
+  TInner,
+  LinkPropsNodeChild & {
+    as: TInner;
+    activePropName?: null;
+  }
+>;
+
+export type LinkPropsWithActivePropName<
+  TInner extends React.ComponentType<
+    LinkInjectedProps & { [activePropName in TActivePropName]: boolean }
+  >,
+  TActivePropName extends string,
+> = ReplaceLinkProps<
+  TInner,
+  LinkPropsNodeChild & {
+    as: TInner;
+    activePropName: TActivePropName;
+  } & {
+    [activePropName in TActivePropName]?: null;
+  }
+>;
+
+export interface LinkPropsWithFunctionChild extends LinkPropsCommon {
+  children: (linkRenderArgs: {
+    href: string;
+    active: boolean;
+    onClick: (event: React.SyntheticEvent<any>) => void;
+  }) => React.ReactNode;
+}
+
+export type LinkProps<
+  TInner extends React.ElementType = never,
+  TInnerWithActivePropName extends React.ComponentType<
+    LinkInjectedProps & { [activePropName in TActivePropName]: boolean }
+  > = never,
+  TActivePropName extends string = never,
+> =
+  | LinkPropsSimple
+  | LinkPropsWithAs<TInner>
+  | LinkPropsWithActivePropName<TInnerWithActivePropName, TActivePropName>
+  | LinkPropsWithFunctionChild;
+
+export class Link<
+  TInner extends React.ElementType = never,
+  TInnerWithActivePropName extends React.ComponentType<
+    LinkInjectedProps & { [activePropName in TActivePropName]: boolean }
+  > = never,
+  TActivePropName extends string = never,
+> extends React.Component<
+  LinkProps<TInner, TInnerWithActivePropName, TActivePropName>
+> {
+  props: LinkProps<TInner, TInnerWithActivePropName, TActivePropName>;
+}
 
 export interface RouterState<TContext = any> {
   match: Match<TContext>;
@@ -284,14 +391,45 @@ export interface RouteComponentDataProps<T, TContext = never>
   data: T;
 }
 
-// export interface BasePathStoreExtension {
-//   addBasePath: (url: string) => string;
-// }
+/**
+ * Returns the Router and current route match from context
+ */
+export function useRouter<TContext = any>(): RouterState<TContext>;
+
+/** Returns the current route Match */
+export function useMatch<TContext = any>(): Match<TContext>;
+
+/** Returns the current route params */
+export function useParams(): Params;
+
+/** Returns the current location object */
+export function useLocation(): Location;
+
+export function withRouter<TProps extends RouterState>(
+  Component: React.ComponentType<TProps>,
+): React.ComponentType<Omit<TProps, keyof RouterState>>;
+
+export class RedirectException {
+  constructor(location: InputLocation, status?: number);
+
+  location: InputLocation;
+
+  status: number;
+}
+
+/**
+ * Create a route configuration from JSX configuration elements.
+ */
+export function makeRouteConfig(node: React.ReactNode): RouteConfig;
 
 export interface FoundStoreExtension {
   matcher: Matcher;
   replaceRouteConfig: (routeConfig: RouteConfig) => void;
 }
+
+export function createMatchEnhancer(
+  matcher: Matcher,
+): StoreEnhancer<{ found: FoundStoreExtension }>;
 
 export type RenderPendingArgs = Match;
 
@@ -316,6 +454,10 @@ export interface CreateRenderOptions {
   renderError?: (args: RenderErrorArgs) => React.ReactNode;
 }
 
+export function createRender(
+  options: CreateRenderOptions,
+): (renderArgs: RenderArgs) => React.ReactElement;
+
 export interface ConnectedRouterOptions extends CreateRenderOptions {
   render?: (args: RenderArgs) => React.ReactElement;
   getFound?: (store: Store) => FoundState;
@@ -329,12 +471,15 @@ export interface ConnectedRouterProps {
 
 export type ConnectedRouter = React.ComponentType<ConnectedRouterProps>;
 
+export function createConnectedRouter(
+  options: ConnectedRouterOptions,
+): ConnectedRouter;
+
 export interface FarceRouterOptions extends ConnectedRouterOptions {
   store?: Store;
   historySession: Session;
   historyMiddlewares?: Middleware[];
   historyOptions?: CreateMiddlewaresOptions;
-  initialLocation?: InputLocation;
   routeConfig: RouteConfig;
 }
 
@@ -342,10 +487,10 @@ export type FarceRouterProps = ConnectedRouterProps;
 
 export type FarceRouter = React.ComponentType<FarceRouterProps>;
 
-// export function createFarceRouter(options: FarceRouterOptions): FarceRouter;
+export function createFarceRouter(options: FarceRouterOptions): FarceRouter;
 
 export interface BrowserRouterOptions
-  extends Omit<FarceRouterOptions, 'historySession'> {
+  extends Omit<FarceRouterOptions, 'historyProtocol'> {
   render?: (args: RenderArgs) => React.ReactElement;
 }
 
@@ -356,23 +501,34 @@ export interface BrowserRouterProps
 
 export type BrowserRouter = React.ComponentType<BrowserRouterProps>;
 
+export function createBrowserRouter(
+  options: BrowserRouterOptions,
+): BrowserRouter;
+
 export interface InitialFarceRouterOptions
   extends Omit<FarceRouterOptions, 'store'> {
   matchContext?: any;
   resolver: Resolver;
 }
 
+export function createInitialFarceRouter(
+  options: InitialFarceRouterOptions,
+): Promise<FarceRouter>;
+
 export type InitialBrowserRouterOptions = Omit<
   InitialFarceRouterOptions,
-  'resolver' | 'historySession'
+  'resolver' | 'historyProtocol'
 >;
+
+export function createInitialBrowserRouter(
+  options: InitialBrowserRouterOptions,
+): Promise<BrowserRouter>;
 
 export interface ElementsRendererProps {
   elements: RenderArgsElements;
 }
 
-export type ElementsRenderer =
-  React.ComponentType<ElementsRendererProps> | null;
+export type ElementsRenderer = React.ComponentType<ElementsRendererProps>;
 
 export interface GetStoreRenderArgsOptions {
   store: Store;
@@ -381,3 +537,7 @@ export interface GetStoreRenderArgsOptions {
   resolver: Resolver;
   basePath?: string;
 }
+
+export function getStoreRenderArgs(
+  options: GetStoreRenderArgsOptions,
+): Promise<RenderArgs>;

@@ -14,8 +14,9 @@ describe('<BaseLink>', () => {
       push: vi.fn(),
       replace: vi.fn(),
       go: vi.fn(),
-      createHref: vi.fn(() => '/'),
-      createLocation: vi.fn(),
+      addBasePath: vi.fn(() => '/'),
+      addNavigationBlocker: vi.fn(),
+      // addNavigationListener: vi.fn(),
       isActive: vi.fn(),
       matcher: {
         match: vi.fn(),
@@ -23,7 +24,6 @@ describe('<BaseLink>', () => {
         isActive: vi.fn(),
         format: vi.fn(),
       } as any,
-      addNavigationListener: vi.fn(),
       replaceRouteConfig: vi.fn(),
     };
   });

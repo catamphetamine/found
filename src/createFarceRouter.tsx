@@ -11,23 +11,28 @@ import {
 
 export default function createFarceRouter({
   store: userStore,
-  historyProtocol,
+  historySession,
   historyMiddlewares,
   historyOptions,
+  initialLocation,
   routeConfig,
   // @ts-expect-error TODO: matcher options should not accessible to end user
   matcherOptions,
   getFound = ({ found }: any) => found as FoundState,
   ...options
 }: FarceRouterOptions): FarceRouter {
-  const Router = createBaseRouter(options);
+  const Router = createBaseRouter(options, {
+    session: historySession,
+    getFound,
+  });
 
   const store =
     userStore ||
     createFarceStore({
-      historyProtocol,
+      historySession,
       historyMiddlewares,
       historyOptions,
+      initialLocation,
       routeConfig,
       matcherOptions,
     });
@@ -38,6 +43,7 @@ export default function createFarceRouter({
       return { match, resolvedMatch };
     });
 
+    // https://github.com/react-restart/hooks/blob/master/src/useIsomorphicEffect.ts
     useIsomorphicEffect(() => {
       return store.subscribe(() => {
         setState((prev) => {

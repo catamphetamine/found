@@ -1,5 +1,4 @@
-
-import ServerProtocol from 'farce/ServerProtocol';
+import { ServerSideRenderSession } from 'navigation-stack';
 import pDefer from 'p-defer';
 import React from 'react';
 import { act } from '@testing-library/react';
@@ -12,7 +11,8 @@ describe('render', () => {
     const deferred = pDefer();
 
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo/baz/a'),
+      historySession: new ServerSideRenderSession(),
+      initialLocation: '/foo/baz/a',
       routeConfig: [
         {
           path: 'foo',
@@ -39,7 +39,7 @@ describe('render', () => {
     });
 
     const { resolver, testRenderer } = await getTestRenderer(Router);
-    
+
     expect(testRenderer.toJSON()).toMatchInlineSnapshot(`
       <div
         className="pending"
@@ -49,8 +49,7 @@ describe('render', () => {
     await act(async () => {
       deferred.resolve();
       await resolver.done;
-    })
-
+    });
 
     expect(testRenderer.toJSON()).toMatchInlineSnapshot(`
       <div
@@ -63,14 +62,14 @@ describe('render', () => {
         </div>
       </div>
     `);
-   
   });
 
   it('should support named child routes', async () => {
     const deferred = pDefer();
 
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo/bar/qux/a'),
+      historySession: new ServerSideRenderSession(),
+      initialLocation: '/foo/bar/qux/a',
       routeConfig: [
         {
           path: 'foo',
@@ -125,7 +124,7 @@ describe('render', () => {
     await act(async () => {
       deferred.resolve();
       await resolver.done;
-    })
+    });
 
     expect(testRenderer.toJSON()).toMatchInlineSnapshot(`
       <div
@@ -145,7 +144,8 @@ describe('render', () => {
 
   it('should support route render method returning a function', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historySession: new ServerSideRenderSession(),
+      initialLocation: '/foo',
       routeConfig: [
         {
           path: '/foo',
@@ -154,13 +154,12 @@ describe('render', () => {
             {
               render:
                 () =>
-                ({ nav, main }) =>
-                  (
-                    <div className="bar">
-                      {nav}
-                      {main}
-                    </div>
-                  ),
+                ({ nav, main }) => (
+                  <div className="bar">
+                    {nav}
+                    {main}
+                  </div>
+                ),
               children: {
                 nav: [
                   {
@@ -184,7 +183,6 @@ describe('render', () => {
       ],
     });
 
-
     const { resolver, testRenderer } = await getTestRenderer(Router);
 
     await act(() => resolver.done);
@@ -206,7 +204,8 @@ describe('render', () => {
 
   it('should support custom renderReady', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historySession: new ServerSideRenderSession(),
+      initialLocation: '/foo',
       routeConfig: [
         {
           path: 'foo',
@@ -230,7 +229,8 @@ describe('render', () => {
 
   it('should support fully custom render', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historySession: new ServerSideRenderSession(),
+      initialLocation: '/foo',
       routeConfig: [
         {
           path: 'foo',
@@ -240,7 +240,6 @@ describe('render', () => {
 
       render: () => <div className="rendered" />,
     });
-
 
     const { resolver, testRenderer } = await getTestRenderer(Router);
 
@@ -252,5 +251,4 @@ describe('render', () => {
       />
     `);
   });
-
 });

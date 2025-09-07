@@ -1,18 +1,19 @@
-import { type FarceStoreExtension, type Protocol } from 'farce';
-import FarceActions from 'farce/Actions';
-import createHistoryEnhancer, {
-  type HistoryEnhancerOptions,
-} from 'farce/createHistoryEnhancer';
-import queryMiddleware from 'farce/queryMiddleware';
+import { type InputLocation, type Session } from 'navigation-stack';
+import { Actions as FarceActions } from 'navigation-stack/redux';
+import {
+  createMiddlewares,
+  type CreateMiddlewaresOptions,
+} from 'navigation-stack/redux';
 import {
   type Middleware,
-  type StoreEnhancer,
+  applyMiddleware,
   combineReducers,
   compose,
   createStore,
 } from 'redux';
 
 import Matcher from './Matcher';
+// import createBasePathEnhancer from './createBasePathEnhancer';
 import createMatchEnhancer from './createMatchEnhancer';
 import foundReducer from './foundReducer';
 import { type RouteConfig } from './typeUtils';
@@ -20,33 +21,40 @@ import { type RouteConfig } from './typeUtils';
 interface Props {
   matcherOptions?: any;
   routeConfig: RouteConfig;
-  historyOptions?: Omit<HistoryEnhancerOptions, 'protocol' | 'middlewares'>;
+  initialLocation?: InputLocation;
+  historyOptions?: CreateMiddlewaresOptions;
   historyMiddlewares?: Middleware[];
-  historyProtocol: Protocol;
+  historySession: Session;
 }
 
+// Originally, `found` router used `farce` library for web browser navigation.
+// Later, I forked `farce` and published it as `navigation-stack` after some refactoring.
+// I could rename this function (and this file) to something like `createNavigationStackStore()`
+// but leaving it as `createFarceStore()` is easier in terms of potentially merging any future changes
+// from the original `found` repository.
 function createFarceStore({
-  historyProtocol,
+  historySession,
   historyMiddlewares,
   historyOptions,
+  initialLocation,
   routeConfig,
   matcherOptions,
 }: Props) {
+  if (historyMiddlewares) {
+    throw new Error('`historyMiddlewares` parameter is not implemented');
+  }
   const store = createStore(
     combineReducers({
       found: foundReducer,
     }),
     compose(
-      createHistoryEnhancer({
-        ...historyOptions,
-        protocol: historyProtocol,
-        middlewares: historyMiddlewares || [queryMiddleware],
-      }) as StoreEnhancer<{ farce: FarceStoreExtension }>,
+      applyMiddleware(...createMiddlewares(historySession, historyOptions)),
+      // createBasePathEnhancer(historyOptions?.basePath),
       createMatchEnhancer(new Matcher(routeConfig, matcherOptions)),
     ),
   );
 
-  store.dispatch(FarceActions.init());
+  store.dispatch(FarceActions.init(initialLocation));
 
   return store;
 }

@@ -1,5 +1,9 @@
-import FarceActions from 'farce/Actions';
-import ServerProtocol from 'farce/ServerProtocol';
+import {
+  ServerSideRenderSession,
+  addBasePath,
+  getLocationUrl,
+} from 'navigation-stack';
+import { Actions as HistoryActions } from 'navigation-stack/redux';
 import React, { useMemo } from 'react';
 
 import RouterContext from './RouterContext';
@@ -33,7 +37,7 @@ function RouterProvider({ renderArgs, children }: RouterProviderProps) {
 export { RouterProvider };
 
 export interface GetFarceResultOptions
-  extends Omit<FarceRouterOptions, 'store' | 'historyProtocol'> {
+  extends Omit<FarceRouterOptions, 'store' | 'historySession'> {
   url: string;
   resolver?: Resolver;
   matchContext?: any;
@@ -62,9 +66,10 @@ export async function getFarceResult({
   }),
 }: GetFarceResultOptions): Promise<FarceResult> {
   const store = createFarceStore({
-    historyProtocol: new ServerProtocol(url),
+    historySession: new ServerSideRenderSession(),
     historyMiddlewares,
     historyOptions,
+    initialLocation: url,
     routeConfig,
   });
 
@@ -75,6 +80,7 @@ export async function getFarceResult({
       store,
       matchContext,
       resolver,
+      basePath: historyOptions?.basePath,
     });
   } catch (e: any) {
     if (e.isFoundRedirectException) {
@@ -83,7 +89,13 @@ export async function getFarceResult({
       return {
         status: e.status,
         redirect: {
-          url: store.farce.createHref(e.location),
+          url:
+            typeof e.location === 'string'
+              ? e.location
+              : addBasePath(
+                  getLocationUrl(e.location),
+                  historyOptions?.basePath,
+                ),
         },
       };
     }
@@ -92,7 +104,7 @@ export async function getFarceResult({
     throw e;
   } finally {
     // This is a no-op with ServerProtocol, but it doesn't hurt.
-    store.dispatch(FarceActions.dispose());
+    store.dispatch(HistoryActions.stop());
   }
 
   return {

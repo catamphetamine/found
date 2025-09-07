@@ -2,16 +2,16 @@ import { dequal } from 'dequal';
 import warning from 'tiny-warning';
 
 import pathToRegexp, { compile } from './pathToRegexp';
+import getLocationQueryForIsActiveMatching from './getLocationQueryForIsActiveMatching';
 import {
   type IsActiveOptions,
-  type LocationDescriptorObject,
+  type InputLocationObject,
   type Match,
   type MatchBase,
   type MatcherResult,
   type Params,
   type ParamsDescriptor,
   type Query,
-  type QueryDescriptor,
   type RouteConfig,
   type RouteIndices,
   type RouteObject,
@@ -290,7 +290,7 @@ export default class Matcher {
 
   isActive(
     { location: matchLocation }: Match,
-    location: LocationDescriptorObject,
+    location: InputLocationObject,
     { exact = false }: IsActiveOptions = {},
   ) {
     return (
@@ -298,7 +298,11 @@ export default class Matcher {
         matchLocation.pathname,
         location.pathname,
         exact,
-      ) && this.isQueryActive(matchLocation.query, location.query)
+      ) &&
+      this.isQueryActive(
+        matchLocation.query,
+        getLocationQueryForIsActiveMatching(location),
+      )
     );
   }
 
@@ -324,10 +328,7 @@ export default class Matcher {
     return matchPathname.indexOf(pathnameWithSeparator) === 0;
   }
 
-  isQueryActive(
-    matchQuery: Query,
-    query?: QueryDescriptor | undefined | null,
-  ) {
+  isQueryActive(matchQuery: Query, query?: Query | undefined | null) {
     if (!query) {
       return true;
     }

@@ -1,5 +1,5 @@
 import delay from 'delay';
-import MemoryProtocol from 'farce/MemoryProtocol';
+import { InMemorySession } from 'navigation-stack';
 
 // @ts-expect-error FIX ME
 import { act } from 'react-test-renderer';
@@ -13,7 +13,8 @@ import { getTestRenderer } from './helpers';
 describe('redirect', () => {
   async function assertRedirect(fooRoute: RouteObject) {
     const Router = createFarceRouter({
-      historyProtocol: new MemoryProtocol('/foo'),
+      historySession: new InMemorySession(),
+      initialLocation: '/foo',
       routeConfig: [
         fooRoute,
         {

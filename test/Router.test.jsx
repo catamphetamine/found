@@ -1,7 +1,6 @@
 import delay from 'delay';
-import FarceActions from 'farce/Actions';
-import MemoryProtocol from 'farce/MemoryProtocol';
-import ServerProtocol from 'farce/ServerProtocol';
+import { InMemorySession, ServerSideRenderSession } from 'navigation-stack';
+import { Actions as HistoryActions } from 'navigation-stack/redux';
 import pDefer from 'p-defer';
 import React, { useEffect } from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
@@ -18,7 +17,8 @@ import { waitFor } from '@testing-library/dom';
 describe('Router', () => {
   it('should render match', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historySession: new ServerSideRenderSession(),
+      initialLocation: '/foo',
       routeConfig: [
         {
           path: '/foo',
@@ -40,7 +40,8 @@ describe('Router', () => {
 
   it('should render 404 when no routes match', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historySession: new ServerSideRenderSession(),
+      initialLocation: '/foo',
       routeConfig: [],
 
       renderError: ({ error }) => <div className={`error-${error.status}`} />,
@@ -57,7 +58,8 @@ describe('Router', () => {
 
   it('should support throwing HttpError in route render method', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historySession: new ServerSideRenderSession(),
+      initialLocation: '/foo',
       routeConfig: [
         {
           path: '/foo',
@@ -70,11 +72,9 @@ describe('Router', () => {
       renderError: ({ error }) => <div className={`error-${error.status}`} />,
     });
 
-
     const { resolver, testRenderer } = await getTestRenderer(Router);
 
     await act(() => resolver.done);
-
 
     expect(testRenderer.toJSON()).toMatchInlineSnapshot(`
       <div
@@ -85,7 +85,8 @@ describe('Router', () => {
 
   it('should support reloading the route configuration', async () => {
     const Router = createFarceRouter({
-      historyProtocol: new ServerProtocol('/foo'),
+      historySession: new ServerSideRenderSession(),
+      initialLocation: '/foo',
       routeConfig: [
         {
           path: '/foo',
@@ -98,7 +99,6 @@ describe('Router', () => {
     });
     const storeRef = React.createRef();
     const { resolver, testRenderer } = await getTestRenderer(Router, storeRef);
-
 
     await act(() => resolver.done);
 
@@ -134,7 +134,8 @@ describe('Router', () => {
   describe('context', () => {
     async function getTestRouter(Component) {
       const Router = createFarceRouter({
-        historyProtocol: new MemoryProtocol('/foo'),
+        historySession: new InMemorySession(),
+        initialLocation: '/foo',
         routeConfig: [
           {
             path: '/foo',
@@ -148,7 +149,6 @@ describe('Router', () => {
       });
 
       const { resolver, testRenderer } = await getTestRenderer(Router);
-
 
       await act(() => resolver.done);
 
@@ -202,7 +202,8 @@ describe('Router', () => {
       const deferred = pDefer();
 
       const Router = createFarceRouter({
-        historyProtocol: new MemoryProtocol('/foo'),
+        historySession: new InMemorySession(),
+        initialLocation: '/foo',
         routeConfig: [
           {
             path: '/foo',
@@ -217,14 +218,16 @@ describe('Router', () => {
       });
 
       const storeRef = React.createRef();
-      
-      const { resolver, testRenderer } = await getTestRenderer(Router, storeRef);
-    
+
+      const { resolver, testRenderer } = await getTestRenderer(
+        Router,
+        storeRef,
+      );
 
       await waitFor(() => expect(storeRef.current).toBeDefined());
 
       await act(async () => {
-        storeRef.current.dispatch(FarceActions.push('/bar'));
+        storeRef.current.dispatch(HistoryActions.push('/bar'));
         await delay(10);
       });
 
@@ -235,7 +238,6 @@ describe('Router', () => {
         return delay(10);
       });
 
-     
       expect(Component).not.toHaveBeenCalled();
       expect(testRenderer.toJSON()).toMatchInlineSnapshot(`
         <div
@@ -251,7 +253,8 @@ describe('Router', () => {
       const deferreds = [deferred1, deferred2];
 
       const Router = createFarceRouter({
-        historyProtocol: new MemoryProtocol('/foo'),
+        historySession: new InMemorySession(),
+        initialLocation: '/foo',
         routeConfig: [
           {
             path: '/foo',
@@ -265,15 +268,14 @@ describe('Router', () => {
         ],
       });
 
-      const { resolver,testRenderer } = await getTestRenderer(Router);
+      const { resolver, testRenderer } = await getTestRenderer(Router);
       const resolver2 = new InstrumentedResolver();
 
       await act(async () => {
-        
         testRenderer.update(<Router resolver={resolver2} />);
         await delay(10);
       });
-      
+
       deferred2.resolve();
       await act(() => resolver2.done);
 

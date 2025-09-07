@@ -2,6 +2,7 @@ import { dequal } from 'dequal';
 import React from 'react';
 import { type Store } from 'redux';
 import warning from 'tiny-warning';
+import { type Session } from 'navigation-stack';
 
 import ActionTypes from './ActionTypes';
 import RouterContext, { type RouterContextValue } from './RouterContext';
@@ -13,20 +14,29 @@ import {
   Match,
   type ConnectedRouterProps,
   type CreateRenderOptions,
+  type FoundState,
   type MatchBase,
   type RenderArgs,
   type Resolver,
   type Router,
 } from './typeUtils';
 
+import { notifyRouterIsReady } from './onRouterReady';
+
 interface CreateProps extends CreateRenderOptions {
   render?: (args: RenderArgs) => React.ReactElement;
+}
+
+interface CreateOptions {
+  getFound: ({ found }: any) => FoundState;
+  session: Session;
 }
 
 interface BaseRouterProps extends ConnectedRouterProps {
   store: Store;
   match: MatchBase;
   resolvedMatch: MatchBase;
+  basePath?: string;
 }
 
 interface BaseRouterState {
@@ -42,35 +52,38 @@ interface BaseRouterState {
   element: React.ReactElement | null;
 }
 
-export default function createBaseRouter({
-  renderPending,
-  renderReady,
-  renderError,
-  /**
-   * The Router level render, is responsible for turning an array of route elements
-   * into a single composed element that can be rendered by React.
-   *
-   * Turning:
-   *
-   * ```jsx
-   * [<AppPage>, null, <ProductPage>, <ProductHistoryPage />]
-   * ```
-   * Into:
-   *
-   * ```jsx
-   * <AppPage>
-   *  <ProductPage>
-   *    <ProductHistoryPage />
-   *  </ProductPage>
-   * </AppPage>
-   * ```
-   */
-  render = createRender({
+export default function createBaseRouter(
+  {
     renderPending,
     renderReady,
     renderError,
-  }),
-}: CreateProps): React.ComponentClass<BaseRouterProps, BaseRouterState> {
+    /**
+     * The Router level render, is responsible for turning an array of route elements
+     * into a single composed element that can be rendered by React.
+     *
+     * Turning:
+     *
+     * ```jsx
+     * [<AppPage>, null, <ProductPage>, <ProductHistoryPage />]
+     * ```
+     * Into:
+     *
+     * ```jsx
+     * <AppPage>
+     *  <ProductPage>
+     *    <ProductHistoryPage />
+     *  </ProductPage>
+     * </AppPage>
+     * ```
+     */
+    render = createRender({
+      renderPending,
+      renderReady,
+      renderError,
+    }),
+  }: CreateProps,
+  { session, getFound }: CreateOptions,
+): React.ComponentClass<BaseRouterProps, BaseRouterState> {
   class BaseRouter extends React.Component<BaseRouterProps, BaseRouterState> {
     router: Router;
 
@@ -88,7 +101,11 @@ export default function createBaseRouter({
       const { store, match, matchContext, resolver, initialRenderArgs } =
         props;
 
-      this.router = createStoreRouterObject(store);
+      this.router = createStoreRouterObject(store, {
+        basePath: props.basePath,
+        session,
+        getFound,
+      });
 
       this.state = {
         isInitialRender: true,
@@ -121,6 +138,15 @@ export default function createBaseRouter({
 
     componentDidMount() {
       this.mounted = true;
+
+      // Fixes a bug when `found` ignores any dispatched navigation actions
+      // until its `componentDidMount()` has been called.
+      // I.e. without this fix calling `dispatch(goto(...))` before `componentDidMount()` has been called
+      // simply wouldn't do anything.
+      if (typeof window !== 'undefined') {
+        notifyRouterIsReady();
+      }
+
       if (!this.props.initialRenderArgs) {
         this.resolveMatch();
       }

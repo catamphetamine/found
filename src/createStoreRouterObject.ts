@@ -1,24 +1,51 @@
-import FarceActions from 'farce/Actions';
+import {
+  type Session,
+  addNavigationBlocker,
+  addBasePath,
+} from 'navigation-stack';
+import { Actions as HistoryActions } from 'navigation-stack/redux';
 import { type Store, bindActionCreators } from 'redux';
 
-import { type Router } from './typeUtils';
+import replaceRouteConfig from './replaceRouteConfig';
+
+import { type Router, type FoundState } from './typeUtils';
 
 const NAVIGATION_ACTION_CREATORS = {
-  push: FarceActions.push,
-  replace: FarceActions.replace,
-  go: FarceActions.go,
+  push: HistoryActions.push,
+  replace: HistoryActions.replace,
+  go: HistoryActions.shift,
 };
 
-export default function createStoreRouterObject(store: Store): Router {
+export default function createStoreRouterObject(
+  store: Store,
+  {
+    basePath,
+    session,
+    getFound,
+  }: {
+    basePath?: string;
+    session: Session;
+    getFound: ({ found }: any) => FoundState;
+  },
+): Router {
   // TODO: create an enhanced store type with found and farce maybe?
-  const { farce, found } = store as any;
+  const { found } = store as any;
   const { matcher } = found;
 
   return {
     ...bindActionCreators(NAVIGATION_ACTION_CREATORS, store.dispatch),
 
-    ...farce,
-    ...found,
+    matcher,
+
+    replaceRouteConfig: (routeConfig) =>
+      replaceRouteConfig(routeConfig, matcher, store, getFound),
+
+    addBasePath: (url: string) => addBasePath(url, basePath),
+
+    // addNavigationListener: (listener) =>
+    //   addNavigationListener(session, listener),
+
+    addNavigationBlocker: (blocker) => addNavigationBlocker(session, blocker),
 
     // Expose isActive from matcher directly for convenience. This pattern is
     // faster than using matcher.isActive.bind(matcher).
