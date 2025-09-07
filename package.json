@@ -31,12 +31,9 @@
     "format": "prettier --write .",
     "lint": "eslint src test",
     "prepublishOnly": "yarn build",
-    "publishLocal": "yarn prepublishOnly && yarn file-butler prepare-publish-dir lib && yalc push lib",
-    "release": "rollout --conventional-commits",
     "tdd": "vitest watch",
     "test": "yarn lint && yarn testonly",
-    "testonly": "vitest run --coverage",
-    "docs": "yarn --cwd www start"
+    "testonly": "vitest run --coverage"
   },
   "prettier": "@4c/prettier-config",
   "exports": {
